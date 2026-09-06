@@ -1,0 +1,6 @@
+KEY_LEFT equ 4Bh
+KEY_RIGHT equ 4Dh
+KEY_UP equ 48h
+KEY_DOWN equ 50h
+
+KEY_F1 equ 3Bh

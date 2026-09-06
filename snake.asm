@@ -1,0 +1,257 @@
+cpu 8086
+
+%include "keys.asm"
+
+SCREEN_WIDTH equ 320
+SCREEN_HEIGHT equ 200
+SCREEN_SIZE equ SCREEN_WIDTH*SCREEN_HEIGHT
+
+BOARD_WIDTH equ 180
+BOARD_HEIGHT equ 180
+
+BOARD_POS_X equ 10
+BOARD_POS_Y equ 10
+
+BOARD_BORDER equ 2
+
+
+%macro DRAW_RECT_AT 4
+    ; x, y, w, h
+    
+    mov bl, %4
+    mov cx, %3
+    mov di, ((%2)*SCREEN_WIDTH)+%1
+    call draw_rect
+%endmacro
+
+%macro COMPUTE_HEAD_POSITION 0
+  call compute_head_position_sr
+;%endmacro
+;
+; ;compute_head_position:
+;     mov ax, [pos_y]
+;     sal ax, 1
+
+;     call times320
+;     mov bx, [pos_x]
+;     sal bx, 1
+;     add ax, bx
+
+;     add ax, SCREEN_WIDTH * BOARD_POS_Y + BOARD_POS_X
+;     mov di, ax
+;    ret
+%endmacro
+
+
+org 0x8000
+    
+    ; init
+    cli
+    xor ax, ax
+    mov ds, ax
+
+    mov ss, ax
+    mov sp, 0x7C00
+
+    mov ax, 0xA000
+    mov es, ax
+
+    ; clock interrupt
+    mov word [0x20], clock_interrupt
+    mov word [0x22], cs
+    sti
+
+    mov ax, 0x13; VGA 320x200x8
+    int 0x10
+    
+    mov ax, 0
+    call clear_to_color
+
+    ; draw board
+    mov ax, 15
+    DRAW_RECT_AT \
+        BOARD_POS_Y - BOARD_BORDER,\
+        BOARD_POS_X - BOARD_BORDER,\
+        BOARD_WIDTH + BOARD_BORDER * 2,\
+        BOARD_HEIGHT + BOARD_BORDER * 2
+    mov ax, 0
+    DRAW_RECT_AT \
+        BOARD_POS_Y,\
+        BOARD_POS_X,\
+        BOARD_WIDTH,\
+        BOARD_HEIGHT
+
+main_loop:
+    COMPUTE_HEAD_POSITION
+    mov ax, 10
+    mov bl, 2
+    mov cx, 2
+    call draw_rect
+
+    call kbd_handler
+
+    mov cx, [clock]
+    or cx, cx
+    jz main_loop
+    dec word [clock]
+
+
+    call move_head
+    call on_new_head_position
+
+    jmp main_loop
+
+
+
+
+clear_to_color:
+    ; input:
+    ; AL = pixel color
+    ; output:
+    ; DI = CX = SCREEN_SIZE
+    xor di, di
+    mov cx, SCREEN_SIZE
+    rep stosb
+    ret
+
+draw_rect:
+    push bx
+    ; input:
+    ; AL = pixel color
+    ; BL = heigh
+    ; CX = width
+    ; DI = pixel start
+    .draw_line:
+        push di
+        push cx
+        rep stosb
+        pop cx
+        pop di
+        add di, 320
+        dec bl
+        jnz .draw_line
+    pop bx
+    ret 
+
+times320:
+    push bx
+    mov bx, ax
+    mov cl, 6
+    shl ax, cl       ; y * 64
+    mov cl, 8
+    shl bx, cl       ; y * 256
+    add ax, bx      ; y * 320
+    pop bx
+    ret
+
+kbd_handler:
+    mov ah, 0x01;peek
+    int 0x16
+    jz .skip_key
+    mov ah, 0x00;pop key
+    int 0x16
+
+    cmp al, 0
+    jnz .skip_key
+    mov [last_scancode], ah
+.skip_key:
+    ret
+
+move_head:
+
+    ; unpause
+    mov al, 0
+    mov [paused], al
+
+    mov ah, [last_scancode]
+    
+    cmp ah, KEY_LEFT
+    je .left
+    cmp ah, KEY_RIGHT
+    je .right
+    cmp ah, KEY_UP
+    je .up
+    cmp ah, KEY_DOWN
+    je .down
+
+    ; still paused
+    mov al, 1
+    mov [paused], al
+
+    ret
+
+
+    .left:
+        dec word [pos_x]
+        ret
+    .right:
+        inc word [pos_x]
+        ret
+    .up:
+        dec word [pos_y]
+        ret
+    .down:
+        inc word [pos_y]
+        ret
+
+    last_scancode db 0
+    paused db 0
+
+clock_interrupt:
+    push ax
+    ;; shouldn't be risky to assume ds=0
+
+    ; push ds
+    ; mov ax, cs
+    ; mov ds, ax
+
+    inc word [clock]
+
+    mov al, 20h
+    out 20h, al ; ack
+
+    ; pop ds
+    pop ax
+    iret
+
+
+clock dw 0
+
+; globals
+
+pos_x dw 21
+pos_y dw 37
+
+
+compute_head_position_sr:
+    mov ax, [pos_y]
+    sal ax, 1
+
+    call times320
+    mov bx, [pos_x]
+    sal bx, 1
+    add ax, bx
+
+    add ax, SCREEN_WIDTH * BOARD_POS_Y + BOARD_POS_X
+    mov di, ax
+   ret
+
+
+;; Game Logic
+
+on_new_head_position:
+    mov al, [paused]
+    test al, al
+    jnz .cont
+    COMPUTE_HEAD_POSITION
+    mov al, [es:di]
+    test al, al
+    jnz game_over
+.cont:
+    ret
+
+
+game_over:
+    mov al, 5
+    DRAW_RECT_AT 50,50,10,10
+    jmp game_over
