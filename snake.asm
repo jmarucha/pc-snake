@@ -64,17 +64,17 @@ org 0x8000
     mov ax, 0x13; VGA 320x200x8
     int 0x10
     
-    mov ax, 0
+    mov al, 0
     call clear_to_color
 
     ; draw board
-    mov ax, 15
+    mov al, 15
     DRAW_RECT_AT \
         BOARD_POS_Y - BOARD_BORDER,\
         BOARD_POS_X - BOARD_BORDER,\
         BOARD_WIDTH + BOARD_BORDER * 2,\
         BOARD_HEIGHT + BOARD_BORDER * 2
-    mov ax, 0
+    mov al, 0
     DRAW_RECT_AT \
         BOARD_POS_Y,\
         BOARD_POS_X,\
@@ -83,7 +83,7 @@ org 0x8000
 
 main_loop:
     COMPUTE_HEAD_POSITION
-    mov ax, 10
+    mov al, 10
     mov bl, 2
     mov cx, 2
     call draw_rect
