@@ -5,6 +5,11 @@ cpu 8086
 %include "colors.asm"
 
 
+CELL_EMPTY equ COLOR_BLACK
+CELL_SNAKE equ COLOR_LIGHT_GREEN
+CELL_SNAKE_FULL equ COLOR_GREEN
+CELL_FOOD equ COLOR_LIGHT_RED
+
 %macro DRAW_RECT_AT 4
     ; x, y, w, h
     
@@ -52,6 +57,10 @@ org 0x8000
         BOARD_WIDTH,\
         BOARD_HEIGHT
     
+    mov  ah, 00h
+    int  1Ah            ; CX:DX = liczba tików
+    ;mov  seed, dx
+    
 
     call deq_push
     call deq_push
@@ -70,25 +79,27 @@ main_loop:
 
     ; pos = head
     call compute_new_head_position
-    call test_head_free
-    call draw_at
-
+    ; pos = new_head
+    call move_head
     call deq_push
 
     push word [pos_x]
     push word [pos_y]
-    call deq_pop
 
+    call deq_peek
+    inc byte [deq_begin]
     ; pos = tail
-    mov al, COLOR_BLUE
+    mov al, CELL_EMPTY
+    ; mov al, COLOR_BLUE ; debug poop
     call draw_at
+    
 
     mov ax, [food_x]
     mov [pos_x], ax
     mov ax, [food_y]
     mov [pos_y], ax
     ; pos = food
-    mov al, COLOR_LIGHT_RED
+    mov al, CELL_FOOD
     call draw_at
 
     pop word [pos_y]
@@ -219,22 +230,6 @@ clock_interrupt:
     pop ax
     iret
 
-
-clock dw 0
-
-; globals
-
-pos_x dw 21
-pos_y dw 37
-
-deq_begin db 0
-deq_end db 1
-
-food_x dw 4
-food_y dw 20
-
-has_eaten db 0
-
 DEQUE_ORIG_X equ 0x500 ; 256B size
 DEQUE_ORIG_Y equ 0x700 ; 256B size
 
@@ -251,7 +246,7 @@ deq_push:
     inc byte [deq_end]
     ret
 
-deq_pop:
+deq_peek:
     mov bl, [deq_begin]
     xor bh, bh
     sal bx,1
@@ -261,7 +256,6 @@ deq_pop:
     mov ax, [bx+DEQUE_ORIG_X]
     mov [pos_x], ax
 
-    inc byte [deq_begin]
     ret
 
 compute_screen_pos:
@@ -280,24 +274,43 @@ compute_screen_pos:
 
 ;; Game Logic
 
-test_head_free:
+move_head:
     mov al, [paused]
     test al, al
-    jnz .cont
+    jz .cont 
+    ret
+    .cont:
     call compute_screen_pos
     mov al, [es:di]
 
-    cmp al, COLOR_BLACK ; EMPTY SPACE
-    jz .cont
-    cmp al, COLOR_BLUE ; DEBUG SNAKE
-    jz .cont
-    cmp al, COLOR_LIGHT_RED ; food
-    jz .cont
-.cont:
+    cmp al, CELL_EMPTY
+    jz .draw_new_head
+    cmp al, COLOR_BLUE
+    jz .draw_new_head
+    ; END DEBUG POOP
+
+    cmp al, CELL_FOOD ; food
+    jz .consume_food
+    jmp game_over
+.consume_food:
+    mov ax, 0
+    mov [food_x], ax
+    mov [food_y], ax
+    mov al, CELL_SNAKE_FULL
+    call draw_at
     ret
 
+.draw_new_head:
+    mov al, CELL_SNAKE
+    call draw_at
+    ret
+
+.next_food_position:
+    mov al, [food_x]
 
 game_over:
     mov al, 5
     DRAW_RECT_AT 50,50,10,10
     jmp game_over
+
+%include "globals.asm"
