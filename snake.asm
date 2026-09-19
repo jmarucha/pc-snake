@@ -2,6 +2,7 @@ cpu 8086
 
 %include "keys.asm"
 %include "consts.asm"
+%include "colors.asm"
 
 
 %macro DRAW_RECT_AT 4
@@ -50,6 +51,12 @@ org 0x8000
         BOARD_POS_X,\
         BOARD_WIDTH,\
         BOARD_HEIGHT
+    
+
+    call deq_push
+    call deq_push
+    call deq_push
+    call deq_push
 
 main_loop:
 
@@ -61,32 +68,45 @@ main_loop:
     dec word [clock]
 
 
+    ; pos = head
     call compute_new_head_position
     call test_head_free
-    
-    call compute_screen_pos
-    mov al, 10
-    mov bl, 2
-    mov cx, 2
-    call draw_rect
+    call draw_at
+
+    call deq_push
 
     push word [pos_x]
     push word [pos_y]
     call deq_pop
 
-    call compute_screen_pos
-    mov al, 3
-    mov bl, 2
-    mov cx, 2
-    call draw_rect
+    ; pos = tail
+    mov al, COLOR_BLUE
+    call draw_at
+
+    mov ax, [food_x]
+    mov [pos_x], ax
+    mov ax, [food_y]
+    mov [pos_y], ax
+    ; pos = food
+    mov al, COLOR_LIGHT_RED
+    call draw_at
 
     pop word [pos_y]
     pop word [pos_x]
+    ; pos = head
 
 
     jmp main_loop
 
 
+draw_at:
+    ; using globals pos_x, pos_y
+    push ax
+    call compute_screen_pos
+    mov bl, 2
+    mov cx, 2
+    pop ax
+    jmp draw_rect
 
 
 clear_to_color:
@@ -210,6 +230,10 @@ pos_y dw 37
 deq_begin db 0
 deq_end db 1
 
+food_x dw 4
+food_y dw 20
+
+has_eaten db 0
 
 DEQUE_ORIG_X equ 0x500 ; 256B size
 DEQUE_ORIG_Y equ 0x700 ; 256B size
@@ -262,8 +286,13 @@ test_head_free:
     jnz .cont
     call compute_screen_pos
     mov al, [es:di]
-    test al, al ; crash with object
-    jnz game_over
+
+    cmp al, COLOR_BLACK ; EMPTY SPACE
+    jz .cont
+    cmp al, COLOR_BLUE ; DEBUG SNAKE
+    jz .cont
+    cmp al, COLOR_LIGHT_RED ; food
+    jz .cont
 .cont:
     ret
 
