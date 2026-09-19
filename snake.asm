@@ -13,25 +13,6 @@ cpu 8086
     call draw_rect
 %endmacro
 
-%macro COMPUTE_PX_POSITION 0
-  call COMPUTE_PX_POSITION_sr
-;%endmacro
-;
-; ;COMPUTE_PX_POSITION:
-;     mov ax, [pos_y]
-;     sal ax, 1
-
-;     call times320
-;     mov bx, [pos_x]
-;     sal bx, 1
-;     add ax, bx
-
-;     add ax, SCREEN_WIDTH * BOARD_POS_Y + BOARD_POS_X
-;     mov di, ax
-;    ret
-%endmacro
-
-
 org 0x8000
     
     ; init
@@ -71,11 +52,6 @@ org 0x8000
         BOARD_HEIGHT
 
 main_loop:
-    COMPUTE_PX_POSITION
-    mov al, 10
-    mov bl, 2
-    mov cx, 2
-    call draw_rect
 
     call kbd_handler
 
@@ -85,8 +61,28 @@ main_loop:
     dec word [clock]
 
 
-    call move_head
-    call on_new_head_position
+    call compute_new_head_position
+    call test_head_free
+    
+    call compute_screen_pos
+    mov al, 10
+    mov bl, 2
+    mov cx, 2
+    call draw_rect
+
+    push word [pos_x]
+    push word [pos_y]
+    call deq_pop
+
+    call compute_screen_pos
+    mov al, 3
+    mov bl, 2
+    mov cx, 2
+    call draw_rect
+
+    pop word [pos_y]
+    pop word [pos_x]
+
 
     jmp main_loop
 
@@ -146,7 +142,7 @@ kbd_handler:
 .skip_key:
     ret
 
-move_head:
+compute_new_head_position:
 
     ; unpause
     mov al, 0
@@ -221,7 +217,7 @@ DEQUE_ORIG_Y equ 0x700 ; 256B size
 deq_push:
     mov bl, [deq_end]
     xor bh, bh
-    sal bx
+    sal bx,1
     
     mov ax, [pos_y]
     mov [bx+DEQUE_ORIG_Y], ax
@@ -234,7 +230,7 @@ deq_push:
 deq_pop:
     mov bl, [deq_begin]
     xor bh, bh
-    sal bx
+    sal bx,1
     
     mov ax, [bx+DEQUE_ORIG_Y]
     mov [pos_y], ax
@@ -244,7 +240,7 @@ deq_pop:
     inc byte [deq_begin]
     ret
 
-COMPUTE_PX_POSITION_sr:
+compute_screen_pos:
     mov ax, [pos_y]
     sal ax, 1
 
@@ -260,11 +256,11 @@ COMPUTE_PX_POSITION_sr:
 
 ;; Game Logic
 
-on_new_head_position:
+test_head_free:
     mov al, [paused]
     test al, al
     jnz .cont
-    COMPUTE_PX_POSITION
+    call compute_screen_pos
     mov al, [es:di]
     test al, al ; crash with object
     jnz game_over
