@@ -1,18 +1,7 @@
 cpu 8086
 
 %include "keys.asm"
-
-SCREEN_WIDTH equ 320
-SCREEN_HEIGHT equ 200
-SCREEN_SIZE equ SCREEN_WIDTH*SCREEN_HEIGHT
-
-BOARD_WIDTH equ 180
-BOARD_HEIGHT equ 180
-
-BOARD_POS_X equ 10
-BOARD_POS_Y equ 10
-
-BOARD_BORDER equ 2
+%include "consts.asm"
 
 
 %macro DRAW_RECT_AT 4
@@ -24,11 +13,11 @@ BOARD_BORDER equ 2
     call draw_rect
 %endmacro
 
-%macro COMPUTE_HEAD_POSITION 0
-  call compute_head_position_sr
+%macro COMPUTE_PX_POSITION 0
+  call COMPUTE_PX_POSITION_sr
 ;%endmacro
 ;
-; ;compute_head_position:
+; ;COMPUTE_PX_POSITION:
 ;     mov ax, [pos_y]
 ;     sal ax, 1
 
@@ -82,7 +71,7 @@ org 0x8000
         BOARD_HEIGHT
 
 main_loop:
-    COMPUTE_HEAD_POSITION
+    COMPUTE_PX_POSITION
     mov al, 10
     mov bl, 2
     mov cx, 2
@@ -222,8 +211,40 @@ clock dw 0
 pos_x dw 21
 pos_y dw 37
 
+deq_begin db 0
+deq_end db 1
 
-compute_head_position_sr:
+
+DEQUE_ORIG_X equ 0x500 ; 256B size
+DEQUE_ORIG_Y equ 0x700 ; 256B size
+
+deq_push:
+    mov bl, [deq_end]
+    xor bh, bh
+    sal bx
+    
+    mov ax, [pos_y]
+    mov [bx+DEQUE_ORIG_Y], ax
+    mov ax, [pos_x]
+    mov [bx+DEQUE_ORIG_X], ax
+
+    inc byte [deq_end]
+    ret
+
+deq_pop:
+    mov bl, [deq_begin]
+    xor bh, bh
+    sal bx
+    
+    mov ax, [bx+DEQUE_ORIG_Y]
+    mov [pos_y], ax
+    mov ax, [bx+DEQUE_ORIG_X]
+    mov [pos_x], ax
+
+    inc byte [deq_begin]
+    ret
+
+COMPUTE_PX_POSITION_sr:
     mov ax, [pos_y]
     sal ax, 1
 
@@ -243,9 +264,9 @@ on_new_head_position:
     mov al, [paused]
     test al, al
     jnz .cont
-    COMPUTE_HEAD_POSITION
+    COMPUTE_PX_POSITION
     mov al, [es:di]
-    test al, al
+    test al, al ; crash with object
     jnz game_over
 .cont:
     ret
