@@ -59,7 +59,7 @@ org 0x8000
     
     mov  ah, 00h
     int  1Ah            ; CX:DX = liczba tików
-    ;mov  seed, dx
+    mov  [seed], dx
     
 
     call deq_push
@@ -87,7 +87,13 @@ main_loop:
     push word [pos_y]
 
     call deq_peek
+
+    call compute_screen_pos
+    mov al, [es:di]
+    cmp al, CELL_SNAKE_FULL
+    jz .skip_pop
     inc byte [deq_begin]
+    .skip_pop:
     ; pos = tail
     mov al, CELL_EMPTY
     ; mov al, COLOR_BLUE ; debug poop
@@ -293,9 +299,13 @@ move_head:
     jz .consume_food
     jmp game_over
 .consume_food:
-    mov ax, 0
+
+    call random_0_89
     mov [food_x], ax
+    call random_0_89
     mov [food_y], ax
+
+; draw new head
     mov al, CELL_SNAKE_FULL
     call draw_at
     ret
@@ -305,12 +315,26 @@ move_head:
     call draw_at
     ret
 
-.next_food_position:
-    mov al, [food_x]
-
 game_over:
-    mov al, 5
-    DRAW_RECT_AT 50,50,10,10
+    mov al, COLOR_RED
+    DRAW_RECT_AT \
+        BOARD_POS_X,\
+        BOARD_POS_Y+(BOARD_HEIGHT-20)/2,\
+        BOARD_WIDTH,\
+        20
     jmp game_over
+
+random_0_89:
+    mov  ax, [seed]
+    mov  bx, 25173
+    mul  bx
+    add  ax, 13849
+    mov  [seed], ax
+
+    xor  dx, dx
+    mov  bx, 90
+    div  bx
+    mov  ax, dx
+    ret
 
 %include "globals.asm"

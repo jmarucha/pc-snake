@@ -1,6 +1,4 @@
 
-clock dw 0
-
 ; globals
 
 pos_x dw 21
@@ -13,3 +11,6 @@ food_x dw 4
 food_y dw 20
 
 has_eaten db 0
+
+clock dw 0
+seed dw 0
