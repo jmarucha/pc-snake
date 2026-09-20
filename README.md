@@ -1,6 +1,7 @@
 # pc-snake
 
-This is bloat free version of popular game `snake`.
+This is bloat free version of popular game `snake`. It fits entirely into drive's bootsector,
+currently being playable at 476 bytes.
 
 ## Minimal system requirements
 
