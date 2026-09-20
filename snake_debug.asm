@@ -1,4 +1,7 @@
 bits 16
+
+;; version with bootloader
+
 org 0x7C00
 
 start:
@@ -53,4 +56,11 @@ important_msg db 10, 10, 32, 32, "cipa", 10, "cyce", 10, "wadowice", 10, 13, 0
 
 times 510 - ($ - $$) db 0; is it Perl?
 
-dw 0xAA55; bootsector magic number
+dw 0xAA55; bootsector magic 
+
+%assign kurwa ($-$$)
+%warning kurwa
+
+%include "snake_game.asm"
+
+times 22*512 - ($ - $$) db 0

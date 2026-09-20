@@ -1,18 +1,19 @@
 ASM = nasm
 DOSBOX = dosbox-x
 
+ASM_FILES = globals.asm consts.asm colors.asm keys.asm snake_game.asm
+
 all: snake.img
 
-boot.bin: boot.asm
-	$(ASM) boot.asm -f bin -o boot.bin
+snake.img: snake.asm $(ASM_FILES)
+	$(ASM) snake.asm -f bin -o snake.img
 
-snake.bin: snake.asm
-	$(ASM) snake.asm -f bin -o snake.bin
+snake_debug.img: snake_debug.asm $(ASM_FILES)
+	$(ASM) snake_debug.asm -f bin -o snake_debug.img
 
-snake.img: boot.bin snake.bin
-	dd if=/dev/zero of=snake.img bs=512 count=2880
-	dd if=boot.bin of=snake.img conv=notrunc
-	dd if=snake.bin of=snake.img bs=512 seek=1 conv=notrunc
+debug: snake_debug.img
+	qemu-system-i386 -drive format=raw,file=snake_debug.img
+
 
 run: snake.img
 	qemu-system-i386 -drive format=raw,file=snake.img
