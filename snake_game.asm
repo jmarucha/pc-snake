@@ -7,7 +7,7 @@ cpu 8086
 
 CELL_EMPTY equ COLOR_BLACK
 CELL_SNAKE equ COLOR_LIGHT_GREEN
-CELL_SNAKE_FULL equ COLOR_GREEN
+CELL_SNAKE_FULL equ COLOR_YELLOW
 CELL_FOOD equ COLOR_LIGHT_RED
 
 %macro DRAW_RECT_AT 4
@@ -56,7 +56,7 @@ CELL_FOOD equ COLOR_LIGHT_RED
         BOARD_HEIGHT
     
     mov  ah, 00h
-    int  1Ah            ; CX:DX = liczba tików
+    int  1Ah
     mov  [seed], dx
     
 
@@ -289,8 +289,8 @@ move_head:
 
     cmp al, CELL_EMPTY
     jz .draw_new_head
-    cmp al, COLOR_BLUE
-    jz .draw_new_head
+    ; cmp al, COLOR_BLUE
+    ; jz .draw_new_head
     ; END DEBUG POOP
 
     cmp al, CELL_FOOD ; food
@@ -336,4 +336,3 @@ random_0_89:
     ret
 
 %include "globals.asm"
-
