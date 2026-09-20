@@ -16,7 +16,7 @@ refer to `dd` manpage.
 
 ## Testing
 
-`make run` and `make dosbox` runs the program with QEMU
+`make run` and `make dosbox` runs the program with QEMU and Dosbox respecively.
 
 ## Known issues
 
