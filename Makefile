@@ -11,8 +11,11 @@ snake.img: snake_entry.asm $(ASM_FILES)
 snake_debug.img: snake_with_bootloader.asm $(ASM_FILES)
 	$(ASM) snake_with_bootloader.asm -f bin -o snake_debug.img -l snake_debug.lst
 
-debug: snake_debug.img
+debug_and_stop: snake_debug.img
 	qemu-system-i386 -drive format=raw,file=snake_debug.img -S -s
+
+debug_and_run: snake_debug.img
+	qemu-system-i386 -drive format=raw,file=snake_debug.img -s
 
 
 run: snake.img

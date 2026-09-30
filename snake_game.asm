@@ -10,6 +10,8 @@ CELL_SNAKE equ COLOR_LIGHT_GREEN
 CELL_SNAKE_FULL equ COLOR_YELLOW
 CELL_FOOD equ COLOR_LIGHT_RED
 
+SNAKE_WIDTH equ 6
+
 %macro DRAW_RECT_AT 4
     ; x, y, w, h
     
@@ -38,7 +40,7 @@ CELL_FOOD equ COLOR_LIGHT_RED
     mov ax, 0x13; VGA 320x200x8
     int 0x10
     
-    mov al, 0
+    mov al, COLOR_ANOTHER_BLACK ; this black generates collisions
     call clear_to_color
 
     ; draw board
@@ -89,7 +91,8 @@ main_loop:
 
     ; move head logic
     move_head:
-        call compute_screen_pos
+        ; call compute_screen_pos
+        mov di, [pos]
         mov al, [es:di]
 
         cmp al, CELL_EMPTY
@@ -103,10 +106,18 @@ main_loop:
         jmp game_over ; collision
     .consume_food:
 
-        call random_0_89
-        mov [food_x], ax
-        call random_0_89
-        mov [food_y], ax
+    ; generate new food
+        call random_0_BS_MIN1
+
+        ; change to BX if board_x + board_size > 256
+        mov bx, SNAKE_WIDTH
+        mul bx
+        add ax, BOARD_POS_X+BOARD_POS_Y*SCREEN_WIDTH
+        mov [food_pos], ax
+        call random_0_BS_MIN1
+        mov bx, SCREEN_WIDTH*SNAKE_WIDTH
+        mul bx
+        add [food_pos], ax
 
     ; draw new head
         mov al, CELL_SNAKE_FULL
@@ -119,13 +130,15 @@ main_loop:
     call draw_at
     call deq_push
 
-    push word [pos_x]
-    push word [pos_y]
+    push word [pos]
 
     ; tail move logic
     call deq_peek
-    call compute_screen_pos
+    mov di, [pos]
     mov al, [es:di]
+
+
+
     cmp al, CELL_SNAKE_FULL
     jz .skip_pop
     inc byte [deq_begin]
@@ -134,18 +147,17 @@ main_loop:
     mov al, CELL_EMPTY
     ; mov al, COLOR_BLUE ; debug poop
     call draw_at
-    
+    .cont:
 
-    mov ax, [food_x]
-    mov [pos_x], ax
-    mov ax, [food_y]
-    mov [pos_y], ax
+    ;call compute_screen_pos
+    mov di, [food_pos]
+    mov [pos], di
     ; pos = food
     mov al, CELL_FOOD
+    mov di, [pos]
     call draw_at
 
-    pop word [pos_y]
-    pop word [pos_x]
+    pop word [pos]
     ; pos = head
 
 
@@ -155,14 +167,14 @@ main_loop:
 draw_at:
     ; using globals pos_x, pos_y
     push ax
-    call compute_screen_pos
-    mov bl, 2
+    mov di, [pos]
+    mov bl, SNAKE_WIDTH
 
     ; mov cx, 2
     ;; UNSAFE
     ;; aparently, CH = 0 for some reason
     ;; +1 byte, lol
-    mov cl, 2
+    mov cl, SNAKE_WIDTH
     pop ax
     jmp draw_rect
 
@@ -195,19 +207,6 @@ draw_rect:
         jnz .draw_line
     pop bx
     ret 
-
-times320:
-    ; NOTE: cannot cut more bytes using INC for CL
-    ; neither using shl y*64, 1 twice - same bytecout
-    push bx
-    mov bx, ax
-    mov cl, 6
-    shl ax, cl       ; y * 64
-    mov cl, 8
-    shl bx, cl       ; y * 256
-    add ax, bx      ; y * 320
-    pop bx
-    ret
 
 kbd_handler:
     mov ah, 0x01;peek
@@ -247,15 +246,19 @@ compute_new_head_position:
 
     .left:
         dec word [pos_x]
+        sub word [pos], SNAKE_WIDTH
         ret
     .right:
         inc word [pos_x]
+        add word [pos], SNAKE_WIDTH
         ret
     .up:
         dec word [pos_y]
+        sub word [pos], SNAKE_WIDTH*SCREEN_WIDTH
         ret
     .down:
         inc word [pos_y]
+        add word [pos], SNAKE_WIDTH*SCREEN_WIDTH
         ret
 
     last_scancode db 0
@@ -280,16 +283,15 @@ clock_interrupt:
 
 DEQUE_ORIG_X equ 0x500 ; 512B size
 DEQUE_ORIG_Y equ 0x700 ; 512B size
+DEQUE_ORIG equ 0x900;
 
 deq_push:
     mov bl, [deq_end]
     xor bh, bh
     sal bx,1
     
-    mov ax, [pos_y]
-    mov [bx+DEQUE_ORIG_Y], ax
-    mov ax, [pos_x]
-    mov [bx+DEQUE_ORIG_X], ax
+    mov ax, [pos]
+    mov [bx+DEQUE_ORIG], ax
 
     inc byte [deq_end]
     ret
@@ -299,25 +301,10 @@ deq_peek:
     xor bh, bh
     sal bx,1
     
-    mov ax, [bx+DEQUE_ORIG_Y]
-    mov [pos_y], ax
-    mov ax, [bx+DEQUE_ORIG_X]
-    mov [pos_x], ax
+    mov ax, [bx+DEQUE_ORIG]
+    mov [pos], ax
 
     ret
-
-compute_screen_pos:
-    mov ax, [pos_y]
-    sal ax, 1
-
-    call times320
-    mov bx, [pos_x]
-    sal bx, 1
-    add ax, bx
-
-    add ax, SCREEN_WIDTH * BOARD_POS_Y + BOARD_POS_X
-    mov di, ax
-   ret
 
 
 game_over:
@@ -329,7 +316,7 @@ game_over:
         20
     jmp game_over
 
-random_0_89:
+random_0_BS_MIN1:
     mov  ax, [seed]
     mov  bx, 25173
     mul  bx
@@ -337,7 +324,7 @@ random_0_89:
     mov  [seed], ax
 
     xor  dx, dx
-    mov  bx, 90
+    mov  bx, BOARD_SIZE/SNAKE_WIDTH
     div  bx
     mov  ax, dx
     ret
