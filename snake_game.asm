@@ -60,9 +60,10 @@ CELL_FOOD equ COLOR_LIGHT_RED
     mov  [seed], dx
     
     ; mov CX, 4
+    ;; UNSAFE
     ;; CH = 0 if boot sequence took less than 258 hours
     ;; +1 byte, lol
-    mov CL, 4
+    mov cl, 4
     .l:
     call deq_push
     loop .l
@@ -156,7 +157,12 @@ draw_at:
     push ax
     call compute_screen_pos
     mov bl, 2
-    mov cx, 2
+
+    ; mov cx, 2
+    ;; UNSAFE
+    ;; aparently, CH = 0 for some reason
+    ;; +1 byte, lol
+    mov cl, 2
     pop ax
     jmp draw_rect
 
@@ -234,8 +240,7 @@ compute_new_head_position:
     je .down
 
     ; still paused
-    mov al, 1
-    mov [paused], al
+    inc byte [paused]
 
     ret
 
@@ -273,8 +278,8 @@ clock_interrupt:
     pop ax
     iret
 
-DEQUE_ORIG_X equ 0x500 ; 256B size
-DEQUE_ORIG_Y equ 0x700 ; 256B size
+DEQUE_ORIG_X equ 0x500 ; 512B size
+DEQUE_ORIG_Y equ 0x700 ; 512B size
 
 deq_push:
     mov bl, [deq_end]
