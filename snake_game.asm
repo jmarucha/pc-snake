@@ -1,5 +1,6 @@
 cpu 8086
 
+%include "settings.asm"
 %include "keys.asm"
 %include "consts.asm"
 %include "colors.asm"
@@ -10,7 +11,6 @@ CELL_SNAKE equ COLOR_LIGHT_GREEN
 CELL_SNAKE_FULL equ COLOR_YELLOW
 CELL_FOOD equ COLOR_LIGHT_RED
 
-SNAKE_WIDTH equ 6
 
 %macro DRAW_RECT_AT 4
     ; x, y, w, h
@@ -245,19 +245,15 @@ compute_new_head_position:
 
 
     .left:
-        dec word [pos_x]
         sub word [pos], SNAKE_WIDTH
         ret
     .right:
-        inc word [pos_x]
         add word [pos], SNAKE_WIDTH
         ret
     .up:
-        dec word [pos_y]
         sub word [pos], SNAKE_WIDTH*SCREEN_WIDTH
         ret
     .down:
-        inc word [pos_y]
         add word [pos], SNAKE_WIDTH*SCREEN_WIDTH
         ret
 
