@@ -12,5 +12,7 @@ food_y dw 20
 
 has_eaten db 0
 
-clock dw 0
-seed dw 0
+clock db 0
+
+; bootsector magic number
+seed equ 0x7DFE

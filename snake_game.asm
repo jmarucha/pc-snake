@@ -72,8 +72,8 @@ main_loop:
 
     call kbd_handler
 
-    mov cx, [clock]
-    or cx, cx
+    mov cl, [clock]
+    or cl, cl
     jz main_loop
     dec word [clock]
 
@@ -191,6 +191,8 @@ draw_rect:
     ret 
 
 times320:
+    ; NOTE: cannot cut more bytes using INC for CL
+    ; neither using shl y*64, 1 twice - same bytecout
     push bx
     mov bx, ax
     mov cl, 6
@@ -262,7 +264,7 @@ clock_interrupt:
     ; mov ax, cs
     ; mov ds, ax
 
-    inc word [clock]
+    inc byte [clock]
 
     mov al, 20h
     out 20h, al ; ack
