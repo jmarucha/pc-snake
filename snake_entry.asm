@@ -5,8 +5,8 @@ org 0x7C00
 %include "snake_game.asm"
 
 
-%assign CODE_SIZE ($-$$)
-%warning Code size: CODE_SIZE
+%assign s ($-$$)
+%warning GAME SIZE: s
 
 
 times 510 - ($ - $$) db 0; is it Perl?

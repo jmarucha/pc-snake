@@ -17,7 +17,3 @@ refer to `dd` manpage.
 ## Testing
 
 `make run` and `make dosbox` runs the program with QEMU and Dosbox respecively.
-
-## Known issues
-
-Something went wrong with "debug" version (one with bootloader).

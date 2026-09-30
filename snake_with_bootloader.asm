@@ -2,7 +2,9 @@ bits 16
 
 ;; version with bootloader
 
-org 0x7C00
+
+section mbr
+    org 0x7C00
 
 start:
     cli
@@ -28,13 +30,7 @@ start:
 
     int 0x13
     jc disk_error
-    call success; 
-
     jmp 0x0000:0x8000
-
-success:
-    mov si, important_msg
-    jmp print_cstr
 
 disk_error:
     mov si, error_msg
@@ -52,15 +48,19 @@ print_cstr: ; si - string location
 boot_drive db 0
 
 error_msg db "Disk read error!", 0
-important_msg db 10, 10, 32, 32, "cipa", 10, "cyce", 10, "wadowice", 10, 13, 0
+
+%assign s ($-$$)
+%warning BOOTLOADER SIZE: s
 
 times 510 - ($ - $$) db 0; is it Perl?
 
 dw 0xAA55; bootsector magic 
 
-%assign kurwa ($-$$)
-%warning kurwa
+section stage2 vstart=0x8000
 
 %include "snake_game.asm"
 
-times 22*512 - ($ - $$) db 0
+%assign s ($-$$)
+%warning GAME SIZE: s
+
+times 20*512 - ($ - $$) db 0
