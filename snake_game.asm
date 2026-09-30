@@ -59,11 +59,14 @@ CELL_FOOD equ COLOR_LIGHT_RED
     int  1Ah
     mov  [seed], dx
     
-
+    ; mov CX, 4
+    ;; CH = 0 if boot sequence took less than 258 hours
+    ;; +1 byte, lol
+    mov CL, 4
+    .l:
     call deq_push
-    call deq_push
-    call deq_push
-    call deq_push
+    loop .l
+    call draw_at
 
 main_loop:
 
@@ -77,15 +80,49 @@ main_loop:
 
     ; pos = head
     call compute_new_head_position
+
+    mov al, [paused]
+    test al, al
+    jnz main_loop
     ; pos = new_head
-    call move_head
+
+    ; move head logic
+    move_head:
+        call compute_screen_pos
+        mov al, [es:di]
+
+        cmp al, CELL_EMPTY
+        jz .draw_new_head
+        ; cmp al, COLOR_BLUE
+        ; jz .draw_new_head
+        ; END DEBUG POOP
+
+        cmp al, CELL_FOOD ; food
+        jz .consume_food
+        jmp game_over ; collision
+    .consume_food:
+
+        call random_0_89
+        mov [food_x], ax
+        call random_0_89
+        mov [food_y], ax
+
+    ; draw new head
+        mov al, CELL_SNAKE_FULL
+        jmp .move_head_end
+
+    .draw_new_head:
+        mov al, CELL_SNAKE
+        jmp .move_head_end
+.move_head_end:
+    call draw_at
     call deq_push
 
     push word [pos_x]
     push word [pos_y]
 
+    ; tail move logic
     call deq_peek
-
     call compute_screen_pos
     mov al, [es:di]
     cmp al, CELL_SNAKE_FULL
@@ -275,43 +312,6 @@ compute_screen_pos:
     mov di, ax
    ret
 
-
-;; Game Logic
-
-move_head:
-    mov al, [paused]
-    test al, al
-    jz .cont 
-    ret
-    .cont:
-    call compute_screen_pos
-    mov al, [es:di]
-
-    cmp al, CELL_EMPTY
-    jz .draw_new_head
-    ; cmp al, COLOR_BLUE
-    ; jz .draw_new_head
-    ; END DEBUG POOP
-
-    cmp al, CELL_FOOD ; food
-    jz .consume_food
-    jmp game_over
-.consume_food:
-
-    call random_0_89
-    mov [food_x], ax
-    call random_0_89
-    mov [food_y], ax
-
-; draw new head
-    mov al, CELL_SNAKE_FULL
-    call draw_at
-    ret
-
-.draw_new_head:
-    mov al, CELL_SNAKE
-    call draw_at
-    ret
 
 game_over:
     mov al, COLOR_RED
