@@ -17,3 +17,19 @@ refer to `dd` manpage.
 ## Testing
 
 `make run` and `make dosbox` runs the program with QEMU and Dosbox respecively.
+
+## Debug
+
+`make debug` starts QEMU interrupted and with debug server.
+
+Use `gdb` to connect:
+
+```bash
+$ gdb
+
+(gdb) target remote :1234
+# stuff with breakpoints
+(gdb) continue
+```
+
+`snake_debug.lst` contains location addresses, just add 8000h to address straight after label.
