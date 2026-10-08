@@ -17,6 +17,7 @@ cpu 8086
     
     ; init
     cli
+    cld
     xor ax, ax
     mov ds, ax
 
@@ -260,6 +261,10 @@ compute_new_head_position:
 
     ; unpause
     mov al, 0
+    
+    mov ax, COLOR_BLACK
+    DRAW_RECT_AT 0, 0, 4, 4
+
     mov [paused], al
 
     mov ah, [last_scancode]
@@ -275,6 +280,9 @@ compute_new_head_position:
 
     ; still paused
     inc byte [paused]
+
+    mov ax, COLOR_BLUE
+    DRAW_RECT_AT 0, 0, 4, 4
 
     ret
 
