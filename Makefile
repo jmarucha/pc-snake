@@ -1,7 +1,7 @@
 ASM = nasm
 DOSBOX = dosbox-x
 
-ASM_FILES = globals.asm consts.asm colors.asm keys.asm snake_game.asm
+ASM_FILES = $(wildcard *.asm) 
 
 all: snake.img
 

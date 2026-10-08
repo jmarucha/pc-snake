@@ -114,7 +114,7 @@ main_loop:
         push ax
 
         mov ah, 02h
-        xor bh, bh
+        xor bh, bh ; PAGE 0
         mov dx, (SCORE_POSITION_Y/8)*256+(SCORE_POSITION_X/8)
         int 10h
 
@@ -123,8 +123,9 @@ main_loop:
         mov ah, 0Eh
         xchg dh, al
         mov bl, COLOR_WHITE
-        ;xor bh, bh
+        ; xor bh, bh - UNSAFE
         int 10h
+        ; mov ah, 0Eh - UNSAFE
         xchg dl, al
         int 10h
 
