@@ -6,12 +6,6 @@ cpu 8086
 %include "colors.asm"
 
 
-CELL_EMPTY equ COLOR_BLACK
-CELL_SNAKE equ COLOR_LIGHT_GREEN
-CELL_SNAKE_FULL equ COLOR_YELLOW
-CELL_FOOD equ COLOR_LIGHT_RED
-
-
 %macro DRAW_RECT_AT 4
     ; x, y, w, h
     
@@ -69,6 +63,7 @@ CELL_FOOD equ COLOR_LIGHT_RED
     .l:
     call deq_push
     loop .l
+    ; mov al, CELL_SNAKE
     call draw_at
 
 main_loop:
@@ -168,17 +163,26 @@ main_loop:
     mov di, [pos]
     mov al, [es:di]
 
-
-
+%if SIMPLIFIED_TAIL_STATE_MACHINE
     cmp al, CELL_SNAKE_FULL
     jz .skip_pop
     inc byte [deq_begin]
     .skip_pop:
-    ; pos = tail
     mov al, CELL_EMPTY
-    ; mov al, COLOR_BLUE ; debug poop
     call draw_at
     .cont:
+%else
+    cmp al, CELL_SNAKE_FULL
+    jnz .pop_food
+    mov al, CELL_SNAKE
+    jmp .cont
+    .pop_food:
+    inc byte [deq_begin]
+    mov al, CELL_EMPTY
+    .cont:
+    call draw_at
+%endif
+
 
     ;call compute_screen_pos
     mov di, [food_pos]
@@ -308,9 +312,7 @@ clock_interrupt:
     pop ax
     iret
 
-DEQUE_ORIG_X equ 0x500 ; 512B size
-DEQUE_ORIG_Y equ 0x700 ; 512B size
-DEQUE_ORIG equ 0x900;
+DEQUE_ORIG equ 0x500;
 
 deq_push:
     mov bl, [deq_end]
