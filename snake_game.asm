@@ -34,17 +34,17 @@ cpu 8086
     mov ax, 0x13; VGA 320x200x8
     int 0x10
     
-    mov al, COLOR_ANOTHER_BLACK ; this black generates collisions
+    mov al, COLOR_BACKGROUND ; this black generates collisions
     call clear_to_color
 
     ; draw board
-    mov al, 15
+    mov al, COLOR_BORDER
     DRAW_RECT_AT \
         BOARD_POS_Y - BOARD_BORDER,\
         BOARD_POS_X - BOARD_BORDER,\
         BOARD_WIDTH + BOARD_BORDER * 2,\
         BOARD_HEIGHT + BOARD_BORDER * 2
-    mov al, 0
+    mov al, CELL_EMPTY
     DRAW_RECT_AT \
         BOARD_POS_Y,\
         BOARD_POS_X,\
