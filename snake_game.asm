@@ -60,12 +60,12 @@ CELL_FOOD equ COLOR_LIGHT_RED
     mov  ah, 00h
     int  1Ah
     mov  [seed], dx
-    
-    ; mov CX, 4
-    ;; UNSAFE
-    ;; CH = 0 if boot sequence took less than 258 hours
-    ;; +1 byte, lol
+
+    %if UNSAFE_CLOCK
     mov cl, 4
+    %else
+    mov cx, 4
+    %endif
     .l:
     call deq_push
     loop .l
@@ -123,25 +123,32 @@ main_loop:
         mov ah, 0Eh
         xchg dh, al
         mov bl, COLOR_WHITE
-        ; xor bh, bh - UNSAFE
+        %if !UNSAFE_BIOS_CALLS
+            xor bh, bh
+        %endif
         int 10h
-        ; mov ah, 0Eh - UNSAFE
         xchg dl, al
+        %if !UNSAFE_BIOS_CALLS
+            mov ah, 0Eh
+            xor bh, bh
+            mov bl, COLOR_WHITE
+        %endif
         int 10h
 
 
     ; generate new food
         call random_0_BS_MIN1
 
-        ; change to BX if board_x + board_size > 256
         mov bx, SNAKE_WIDTH
         mul bx
         add ax, BOARD_POS_X+BOARD_POS_Y*SCREEN_WIDTH
+        ; X-offset from BOARD_POS
         mov [food_pos], ax
         call random_0_BS_MIN1
         mov bx, SCREEN_WIDTH*SNAKE_WIDTH
         mul bx
         add [food_pos], ax
+        ; Y-offset from BOARD_POS
 
     ; draw new head
         mov al, CELL_SNAKE_FULL
@@ -194,11 +201,11 @@ draw_at:
     mov di, [pos]
     mov bl, SNAKE_WIDTH
 
-    ; mov cx, 2
-    ;; UNSAFE
-    ;; aparently, CH = 0 for some reason
-    ;; +1 byte, lol
-    mov cl, SNAKE_WIDTH
+    %if UNSAFE_IDK
+        mov cl, SNAKE_WIDTH
+    %else
+        mov cx, SNAKE_WIDTH
+    %endif
     pop ax
     jmp draw_rect
 
