@@ -69,13 +69,12 @@ cpu 8086
 
 main_loop:
 
-    call kbd_handler
-
     mov cl, [clock]
     or cl, cl
     jz main_loop
     dec word [clock]
 
+    call kbd_handler
 
     ; pos = head
     call compute_new_head_position
@@ -261,9 +260,6 @@ compute_new_head_position:
 
     ; unpause
     mov al, 0
-    
-    mov ax, COLOR_BLACK
-    DRAW_RECT_AT 0, 0, 4, 4
 
     mov [paused], al
 
@@ -280,9 +276,6 @@ compute_new_head_position:
 
     ; still paused
     inc byte [paused]
-
-    mov ax, COLOR_BLUE
-    DRAW_RECT_AT 0, 0, 4, 4
 
     ret
 
