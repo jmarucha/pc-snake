@@ -106,6 +106,29 @@ main_loop:
         jmp game_over ; collision
     .consume_food:
 
+    ; update score
+        inc byte [score]
+        mov al, [score]
+        aam
+        add ax, 0x3030 ; num + 0x30 = chr(num)
+        push ax
+
+        mov ah, 02h
+        xor bh, bh
+        mov dx, (SCORE_POSITION_Y/8)*256+(SCORE_POSITION_X/8)
+        int 10h
+
+        pop dx
+
+        mov ah, 0Eh
+        xchg dh, al
+        mov bl, COLOR_WHITE
+        ;xor bh, bh
+        int 10h
+        xchg dl, al
+        int 10h
+
+
     ; generate new food
         call random_0_BS_MIN1
 
@@ -206,7 +229,7 @@ draw_rect:
         dec bl
         jnz .draw_line
     pop bx
-    ret 
+    ret
 
 kbd_handler:
     mov ah, 0x01;peek

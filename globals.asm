@@ -11,6 +11,6 @@ food_pos dw SCREEN_WIDTH*(BOARD_POS_Y + (20 * SNAKE_WIDTH) % BOARD_HEIGHT)\
 + BOARD_POS_X + (4*SNAKE_WIDTH) % BOARD_WIDTH
 
 clock db 0
-
+score db 0
 ; bootsector magic number
 seed equ 0x7DFE
