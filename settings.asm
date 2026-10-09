@@ -26,10 +26,9 @@ COLOR_BACKGROUND equ COLOR_ANOTHER_BLACK
 
 ; Hacks:
 
-
-; %define UNSAFE_BIOS_CALLS 1; -8 B
-; %define UNSAFE_CLOCK 1; -1 B
-; %define UNSAFE_IDK 1; -1 B
+%define UNSAFE_BIOS_CALLS 1; -8 B
+%define UNSAFE_CLOCK 1; -1 B
+%define UNSAFE_IDK 1; -1 B
 
 %define SIMPLIFIED_TAIL_STATE_MACHINE 1; -2 B
 

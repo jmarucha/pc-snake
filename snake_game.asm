@@ -179,7 +179,7 @@ main_loop:
 
     .draw_new_head:
         mov al, CELL_SNAKE
-        jmp .move_head_end
+        ; jmp .move_head_end
 .move_head_end:
     call draw_at
     call deq_push
