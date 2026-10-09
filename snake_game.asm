@@ -22,17 +22,22 @@ cpu 8086
     mov ds, ax
 
     mov ss, ax
+    DEAD_free_zero_0:
     mov sp, 0x7C00
 
+    DEAD_free_zero_1:
     mov ax, 0xA000
     mov es, ax
 
     ; clock interrupt
+    DEAD_free_zero_3:
     mov word [0x20], clock_interrupt
+    DEAD_free_zero_4:
     mov word [0x22], cs
     sti
 
     mov ax, 0x13; VGA 320x200x8
+    DEAD_bios_opcode_1:
     int 0x10
     
     mov al, COLOR_BACKGROUND ; this black generates collisions
@@ -52,7 +57,9 @@ cpu 8086
         BOARD_WIDTH,\
         BOARD_HEIGHT
     
+    DEAD_free_zero_2:
     mov  ah, 00h
+    DEAD_bios_opcode_2:
     int  1Ah
     mov  [seed], dx
 
@@ -256,7 +263,9 @@ kbd_handler:
 .skip_key:
     ret
 
+
 compute_new_head_position:
+    ; also handles pause
 
     ; unpause
     mov al, 0
@@ -292,9 +301,6 @@ compute_new_head_position:
     .down:
         add word [pos], SNAKE_WIDTH*SCREEN_WIDTH
         ret
-
-    last_scancode db 0
-    paused db 0
 
 clock_interrupt:
     push ax
