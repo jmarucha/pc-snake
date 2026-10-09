@@ -11,8 +11,8 @@ food_pos dw SCREEN_WIDTH*(BOARD_POS_Y + (20 * SNAKE_WIDTH) % BOARD_HEIGHT)\
     clock equ (DEAD_free_zero_0 + 1) ; lower byte of MOV immediate
     score equ (DEAD_free_zero_1 + 1) ; lower byte of MOV immediate
 
-    deq_begin equ DEAD_bios_opcode_1
-    deq_end equ DEAD_bios_opcode_2
+    deq_begin equ DEAD_bios_opcode_1 ; opcode
+    deq_end equ DEAD_bios_opcode_2 ; opcode
 
     last_scancode equ (DEAD_free_zero_2 + 1) ; operand of 8-bit MOV
 %else

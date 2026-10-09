@@ -194,25 +194,22 @@ main_loop:
     mov di, [pos]
     mov al, [es:di]
 
-%ifdef SIMPLIFIED_TAIL_STATE_MACHINE
-    cmp al, CELL_SNAKE_FULL
-    jz .skip_pop
-    inc byte [deq_begin]
-    .skip_pop:
-    mov al, CELL_EMPTY
-    call draw_at
-    .cont:
-%else
-    cmp al, CELL_SNAKE_FULL
-    jnz .pop_food
-    mov al, CELL_SNAKE
-    jmp .cont
-    .pop_food:
-    inc byte [deq_begin]
-    mov al, CELL_EMPTY
-    .cont:
-    call draw_at
-%endif
+    %ifdef SIMPLIFIED_TAIL_STATE_MACHINE
+        cmp al, CELL_SNAKE_FULL
+        jz .skip_pop
+        inc byte [deq_begin]
+        .skip_pop:
+        mov al, CELL_EMPTY
+        call draw_at
+    %else
+        cmp al, CELL_SNAKE_FULL
+        mov al, CELL_SNAKE
+        je  .skip_pop
+        inc byte [deq_begin]
+        mov al, CELL_EMPTY
+        .skip_pop:
+        call draw_at
+    %endif
 
 
     ;call compute_screen_pos
