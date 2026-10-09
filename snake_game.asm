@@ -68,8 +68,8 @@ cpu 8086
     %else
     mov cx, 4
     %endif
-    .l:
     mov di, [pos]
+    .l:
     call deq_push
     loop .l
     ; mov al, CELL_SNAKE
@@ -304,8 +304,7 @@ deq_push:
     xor bh, bh
     sal bx,1
     
-    mov ax, di
-    mov [bx+DEQUE_ORIG], ax
+    mov [bx+DEQUE_ORIG], di
 
     inc byte [deq_end]
     ret
@@ -315,8 +314,7 @@ deq_peek:
     xor bh, bh
     sal bx,1
     
-    mov ax, [bx+DEQUE_ORIG]
-    mov di, ax
+    mov di, [bx+DEQUE_ORIG]
 
     ret
 
