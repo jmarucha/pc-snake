@@ -56,7 +56,7 @@ cpu 8086
     int  1Ah
     mov  [seed], dx
 
-    %if UNSAFE_CLOCK
+    %ifdef UNSAFE_CLOCK
     mov cl, 4
     %else
     mov cx, 4
@@ -118,12 +118,12 @@ main_loop:
         mov ah, 0Eh
         xchg dh, al
         mov bl, COLOR_WHITE
-        %if !UNSAFE_BIOS_CALLS
+        %ifndef UNSAFE_BIOS_CALLS
             xor bh, bh
         %endif
         int 10h
         xchg dl, al
-        %if !UNSAFE_BIOS_CALLS
+        %ifndef UNSAFE_BIOS_CALLS
             mov ah, 0Eh
             xor bh, bh
             mov bl, COLOR_WHITE
@@ -163,7 +163,7 @@ main_loop:
     mov di, [pos]
     mov al, [es:di]
 
-%if SIMPLIFIED_TAIL_STATE_MACHINE
+%ifdef SIMPLIFIED_TAIL_STATE_MACHINE
     cmp al, CELL_SNAKE_FULL
     jz .skip_pop
     inc byte [deq_begin]
@@ -205,7 +205,7 @@ draw_at:
     mov di, [pos]
     mov bl, SNAKE_WIDTH
 
-    %if UNSAFE_IDK
+    %ifdef UNSAFE_IDK
         mov cl, SNAKE_WIDTH
     %else
         mov cx, SNAKE_WIDTH
