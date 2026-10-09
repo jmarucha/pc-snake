@@ -84,16 +84,40 @@ main_loop:
     call kbd_handler
 
     ; pos = head
-    call compute_new_head_position
 
-    mov al, [paused]
-    test al, al
-    jnz main_loop
+    ; compute new head position or handle pause
+
+    ; stack abuse
+    mov ax, .head_collisions
+    push ax
+        mov ah, [last_scancode]
+        cmp ah, KEY_LEFT
+        je .left
+        cmp ah, KEY_RIGHT
+        je .right
+        cmp ah, KEY_UP
+        je .up
+        cmp ah, KEY_DOWN
+        je .down
+        pop ax ; fix call stack
+        jmp main_loop ; paused
+
+
+    .left:
+        sub word [pos], SNAKE_WIDTH
+        ret
+    .right:
+        add word [pos], SNAKE_WIDTH
+        ret
+    .up:
+        sub word [pos], SNAKE_WIDTH*SCREEN_WIDTH
+        ret
+    .down:
+        add word [pos], SNAKE_WIDTH*SCREEN_WIDTH
+        ret
+
+    .head_collisions:
     ; pos = new_head
-
-    ; move head logic
-    move_head:
-        ; call compute_screen_pos
         mov di, [pos]
         mov al, [es:di]
 
@@ -262,45 +286,6 @@ kbd_handler:
     mov [last_scancode], ah
 .skip_key:
     ret
-
-
-compute_new_head_position:
-    ; also handles pause
-
-    ; unpause
-    mov al, 0
-
-    mov [paused], al
-
-    mov ah, [last_scancode]
-    
-    cmp ah, KEY_LEFT
-    je .left
-    cmp ah, KEY_RIGHT
-    je .right
-    cmp ah, KEY_UP
-    je .up
-    cmp ah, KEY_DOWN
-    je .down
-
-    ; still paused
-    inc byte [paused]
-
-    ret
-
-
-    .left:
-        sub word [pos], SNAKE_WIDTH
-        ret
-    .right:
-        add word [pos], SNAKE_WIDTH
-        ret
-    .up:
-        sub word [pos], SNAKE_WIDTH*SCREEN_WIDTH
-        ret
-    .down:
-        add word [pos], SNAKE_WIDTH*SCREEN_WIDTH
-        ret
 
 clock_interrupt:
     push ax

@@ -15,7 +15,6 @@ food_pos dw SCREEN_WIDTH*(BOARD_POS_Y + (20 * SNAKE_WIDTH) % BOARD_HEIGHT)\
     deq_end equ DEAD_bios_opcode_2
 
     last_scancode equ (DEAD_free_zero_2 + 1) ; operand of 8-bit MOV
-    paused equ (DEAD_free_zero_3 + 3); lower byte of MOV target
 %else
     clock db 0
     score db 0
@@ -24,7 +23,6 @@ food_pos dw SCREEN_WIDTH*(BOARD_POS_Y + (20 * SNAKE_WIDTH) % BOARD_HEIGHT)\
     deq_end db 0
 
     last_scancode db 0
-    paused db 0
 %endif
 
 ; bootsector magic number
