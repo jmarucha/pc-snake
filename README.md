@@ -1,12 +1,14 @@
 # pc-snake
 
 This is bloat free version of popular game `snake`. It fits entirely into drive's bootsector,
-currently being playable at 476 bytes.
+currently being playable at 462 bytes (or 448, with unsafe optimizations turned on).
+
+![gameplay](./aux/gameplay.gif)
 
 ## Minimal system requirements
 
 - Intel 8088 or newer
-- 64kB+ of RAM (theoretically 8kB+ is sufficient, but no compatible machine had this little)
+- 32kB+ of RAM (theoretically 8kB+ is sufficient, but no compatible machine had this little)
 - VGA-compatible card
 - IBM PC-compatible BIOS supporting Option ROM
 
@@ -38,8 +40,13 @@ $ gdb
 ## Tested platforms
 
 In emulation:
+
 - QEMU
 - 86Box:
     - IBM PC (1981) with 32 kB RAM, IBM VGA card and GLaBIOS 0.4.0
     - IBM PC (1982) with 64 kB RAM, IBM VGA card -- older BIOSes lack Option ROM support
     - IBM PC XT (1986), IBM PC AT, and Compaq Deskpro 386 with variety of VGA ISA cards.
+
+On metal:
+
+- AMD Ryzen 5800X with 32 GB of RAM and VESA-compatible card (Nvidia 3080)

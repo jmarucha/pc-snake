@@ -46,14 +46,14 @@ cpu 8086
     ; draw board
     mov al, COLOR_BORDER
     DRAW_RECT_AT \
-        BOARD_POS_Y - BOARD_BORDER,\
         BOARD_POS_X - BOARD_BORDER,\
+        BOARD_POS_Y - BOARD_BORDER,\
         BOARD_WIDTH + BOARD_BORDER * 2,\
         BOARD_HEIGHT + BOARD_BORDER * 2
     mov al, CELL_EMPTY
     DRAW_RECT_AT \
-        BOARD_POS_Y,\
         BOARD_POS_X,\
+        BOARD_POS_Y,\
         BOARD_WIDTH,\
         BOARD_HEIGHT
     
