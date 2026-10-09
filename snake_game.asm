@@ -76,6 +76,9 @@ cpu 8086
     call draw_at
 
 main_loop:
+    %ifdef FEAT_HALT
+    hlt
+    %endif
 
     mov cl, [clock]
     or cl, cl
