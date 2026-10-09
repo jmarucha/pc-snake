@@ -69,6 +69,7 @@ cpu 8086
     mov cx, 4
     %endif
     .l:
+    mov di, [pos]
     call deq_push
     loop .l
     ; mov al, CELL_SNAKE
@@ -104,30 +105,26 @@ main_loop:
 
 
     .left:
-        sub word [pos], SNAKE_WIDTH
+        sub word di, SNAKE_WIDTH
         ret
     .right:
-        add word [pos], SNAKE_WIDTH
+        add word di, SNAKE_WIDTH
         ret
     .up:
-        sub word [pos], SNAKE_WIDTH*SCREEN_WIDTH
+        sub word di, SNAKE_WIDTH*SCREEN_WIDTH
         ret
     .down:
-        add word [pos], SNAKE_WIDTH*SCREEN_WIDTH
+        add word di, SNAKE_WIDTH*SCREEN_WIDTH
         ret
 
     .head_collisions:
     ; pos = new_head
-        mov di, [pos]
         mov al, [es:di]
 
         cmp al, CELL_EMPTY
         jz .draw_new_head
-        ; cmp al, COLOR_BLUE
-        ; jz .draw_new_head
-        ; END DEBUG POOP
 
-        cmp al, CELL_FOOD ; food
+        cmp al, CELL_FOOD
         jz .consume_food
         jmp game_over ; collision
     .consume_food:
@@ -187,12 +184,11 @@ main_loop:
     call draw_at
     call deq_push
 
-    push word [pos]
+    push di
 
     ; tail move logic
     call deq_peek
-    mov di, [pos]
-    mov al, [es:di]
+    mov al, [es:di] ; DI = last segment
 
     %ifdef SIMPLIFIED_TAIL_STATE_MACHINE
         cmp al, CELL_SNAKE_FULL
@@ -211,16 +207,13 @@ main_loop:
         call draw_at
     %endif
 
-
     ;call compute_screen_pos
     mov di, [food_pos]
-    mov [pos], di
     ; pos = food
     mov al, CELL_FOOD
-    mov di, [pos]
     call draw_at
 
-    pop word [pos]
+    pop di
     ; pos = head
 
 
@@ -228,9 +221,7 @@ main_loop:
 
 
 draw_at:
-    ; using globals pos_x, pos_y
     push ax
-    mov di, [pos]
     mov bl, SNAKE_WIDTH
 
     %ifdef UNSAFE_IDK
@@ -253,6 +244,7 @@ clear_to_color:
     ret
 
 draw_rect:
+    push di
     push bx
     ; input:
     ; AL = pixel color
@@ -269,6 +261,7 @@ draw_rect:
         dec bl
         jnz .draw_line
     pop bx
+    pop di
     ret
 
 kbd_handler:
@@ -308,7 +301,7 @@ deq_push:
     xor bh, bh
     sal bx,1
     
-    mov ax, [pos]
+    mov ax, di
     mov [bx+DEQUE_ORIG], ax
 
     inc byte [deq_end]
@@ -320,7 +313,7 @@ deq_peek:
     sal bx,1
     
     mov ax, [bx+DEQUE_ORIG]
-    mov [pos], ax
+    mov di, ax
 
     ret
 
