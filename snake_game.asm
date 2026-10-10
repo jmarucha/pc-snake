@@ -41,7 +41,11 @@ cpu 8086
     int 0x10
     
     mov al, COLOR_BACKGROUND ; this black generates collisions
-    call clear_to_color
+
+    ;clear_to_color:
+    xor di, di
+    mov cx, SCREEN_SIZE
+    rep stosb
 
     ; draw board
     mov al, COLOR_BORDER
@@ -224,7 +228,6 @@ main_loop:
 
 
 draw_at:
-    push ax
     mov bl, SNAKE_WIDTH
 
     %ifdef UNSAFE_IDK
@@ -232,19 +235,7 @@ draw_at:
     %else
         mov cx, SNAKE_WIDTH
     %endif
-    pop ax
     jmp draw_rect
-
-
-clear_to_color:
-    ; input:
-    ; AL = pixel color
-    ; output:
-    ; DI = CX = SCREEN_SIZE
-    xor di, di
-    mov cx, SCREEN_SIZE
-    rep stosb
-    ret
 
 draw_rect:
     push di
