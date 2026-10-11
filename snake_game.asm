@@ -8,13 +8,13 @@ cpu 8086
 
 %macro DRAW_RECT_AT 4
     ; x, y, w, h
-    
+
     mov bl, %4
     mov cx, %3
     mov di, ((%2)*SCREEN_WIDTH)+%1
     call draw_rect
 %endmacro
-    
+
     ; init
     cli
     cld
@@ -39,7 +39,7 @@ cpu 8086
     mov ax, 0x13; VGA 320x200x8
     DEAD_bios_opcode_1:
     int 0x10
-    
+
     mov al, COLOR_BACKGROUND ; this black generates collisions
 
     ;clear_to_color:
@@ -60,7 +60,7 @@ cpu 8086
         BOARD_POS_Y,\
         BOARD_WIDTH,\
         BOARD_HEIGHT
-    
+
     DEAD_free_zero_2:
     mov  ah, 00h
     DEAD_bios_opcode_2:
@@ -151,18 +151,13 @@ main_loop:
         pop dx
 
         mov ah, 0Eh
-        xchg dh, al
+        xchg al, dh
         mov bl, COLOR_WHITE
-        %ifndef UNSAFE_BIOS_CALLS
-            xor bh, bh
-        %endif
         int 10h
-        xchg dl, al
-        %ifndef UNSAFE_BIOS_CALLS
-            mov ah, 0Eh
-            xor bh, bh
-            mov bl, COLOR_WHITE
-        %endif
+    %ifndef UNSAFE_BIOS_CALLS
+        mov ah, 0Eh
+    %endif
+        xchg al, dl
         int 10h
 
 
@@ -294,7 +289,7 @@ deq_push:
     mov bl, [deq_end]
     xor bh, bh
     sal bx,1
-    
+
     mov [bx+DEQUE_ORIG], di
 
     inc byte [deq_end]
@@ -304,7 +299,7 @@ deq_peek:
     mov bl, [deq_begin]
     xor bh, bh
     sal bx,1
-    
+
     mov di, [bx+DEQUE_ORIG]
 
     ret
@@ -329,7 +324,7 @@ random_0_BS_MIN1:
     xor  dx, dx
     mov  bx, BOARD_SIZE/SNAKE_WIDTH
     div  bx
-    mov  ax, dx
+    xchg  ax, dx
     ret
 
 %include "globals.asm"
