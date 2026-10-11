@@ -25,7 +25,6 @@ cpu 8086
     DEAD_free_zero_0:
     mov sp, 0x7C00
 
-    DEAD_free_zero_1:
     mov ah, 0xA0 ; ax = 0xA000
     mov es, ax
 
