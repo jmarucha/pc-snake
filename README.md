@@ -1,9 +1,16 @@
 # pc-snake
 
 This is bloat free version of popular game `snake`. It fits entirely into drive's bootsector,
-currently being playable at 462 bytes (or 448, with unsafe optimizations turned on).
+currently being playable at 404 bytes.
 
 ![gameplay](./aux/gameplay.gif)
+
+## Features
+
+- Immersive snake growth! (Snake grows when food reaches the tail, Nokia-style)
+- Score counter!
+- Realistic colors (4 on screen, 5 in V-buffer!)
+- Pause option (F1 and quite a lot of different buttons)
 
 ## Minimal system requirements
 
