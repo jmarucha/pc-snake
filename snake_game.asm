@@ -26,7 +26,7 @@ cpu 8086
     mov sp, 0x7C00
 
     DEAD_free_zero_1:
-    mov ax, 0xA000
+    mov ah, 0xA0 ; ax = 0xA000
     mov es, ax
 
     ; clock interrupt
