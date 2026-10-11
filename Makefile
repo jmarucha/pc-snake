@@ -1,7 +1,7 @@
 ASM = nasm
 DOSBOX = dosbox-x
 
-ASM_FILES = $(wildcard *.asm) 
+ASM_FILES = $(wildcard *.asm)
 
 all: snake.img
 
