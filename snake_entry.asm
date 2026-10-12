@@ -1,5 +1,3 @@
-%include "settings.asm"
-
 org 0x7C00
 
 %ifndef UNSAFE_SKIP_JMP

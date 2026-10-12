@@ -1,8 +1,5 @@
 bits 16
-
-%include "settings.asm"
-;; version with bootloader
-
+; version with bootloader
 
 section mbr
     org 0x7C00

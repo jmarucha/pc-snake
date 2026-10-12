@@ -2,13 +2,20 @@ ASM = nasm
 DOSBOX = dosbox-x
 
 ASM_FILES = $(wildcard *.asm)
+SETTINGS=settings.asm
 
 all: snake.img
 
-snake.img: snake_entry.asm $(ASM_FILES)
-	$(ASM) snake_entry.asm -f bin -o snake.img
+snake.img: $(ASM_FILES)
+	$(ASM) -p $(SETTINGS) snake_entry.asm -f bin -o snake.img
 
-snake_debug.img: snake_with_bootloader.asm $(ASM_FILES)
+snake_lean.img: $(ASM_FILES)
+	$(ASM) -p settings_lean.asm snake_entry.asm -f bin -o snake_lean.img
+
+snake_standard.img: $(ASM_FILES)
+	$(ASM) -p settings.asm snake_entry.asm -f bin -o snake_lean.img
+
+snake_debug.img: $(ASM_FILES)
 	$(ASM) snake_with_bootloader.asm -f bin -o snake_debug.img -l snake_debug.lst
 
 debug_and_stop: snake_debug.img
