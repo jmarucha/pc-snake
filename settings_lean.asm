@@ -30,6 +30,7 @@ COLOR_BACKGROUND equ COLOR_ZERO
 %define UNSAFE_CLOCK; -1 B
 %define UNSAFE_IDK; -1 B
 %define UNSAFE_SKIP_JMP; -5 B
+; %define UNSAFE_PC_SPEAKER -10; breaks 8088 machines
 
 %define SIMPLIFIED_TAIL_STATE_MACHINE 1; -2 B
 

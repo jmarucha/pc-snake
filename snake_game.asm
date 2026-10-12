@@ -142,7 +142,10 @@ main_loop:
 
     %ifdef FEAT_SOUND
         ; bytes 0 & 1 == 1 -- fire pc speaker
-        mov al, 3
+        %ifndef UNSAFE_PC_SPEAKER
+        in al, 61h
+        %endif
+        or al, 3
         out 61h, al
     %endif
 
@@ -292,6 +295,10 @@ clock_interrupt:
     out 20h, al ; ack
 
     %ifdef FEAT_SOUND
+    %ifndef UNSAFE_PC_SPEAKER
+    in al, 61h
+    and al, 0xFF-3
+    %endif
     ; bytes 0 & 1 == 0 -- mute pc speaker
     out 61h, al
     %endif
@@ -337,6 +344,10 @@ game_over:
     mov al, 33
     out 42h, al
     out 42h, al
+    %ifndef UNSAFE_PC_SPEAKER
+    in al, 61h
+    or al, 3
+    %endif
     out 61h, al
     %endif
     .l:

@@ -24,13 +24,18 @@ currently being playable at 318 bytes, and can be packed with features in 412 by
 
 As of 1.2, two builds are provided:
 - `snake_lean.img` (**318** bytes) - as barebones as possible
-- `snake_standard.img` (**412** bytes) - score counter, random seed, and slightly fancier
+- `snake_standard.img` (**422** bytes) - score counter, random seed, and slightly fancier
   graphics, sound.
 
 ## Building nad installing
 
-Use `make` to build the bootsector image. If you want to put this bootsector onto drive,
-refer to `dd` manpage.
+Use `make` to build the bootsector image. If you want to put this bootsector onto a floppy,
+refer to `dd` manpage. You may want to expand the image first (some emulators, like dosbox,
+require that as well).
+
+```sh
+truncate -s360k snake.img
+```
 
 `make snake_standard.img` and `make snake_lean.img` shoud reflect the configuration
 of release builds.
