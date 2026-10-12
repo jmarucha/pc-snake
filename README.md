@@ -1,7 +1,7 @@
 # pc-snake
 
 This is bloat free version of popular game `snake`. It fits entirely into drive's bootsector,
-currently being playable at 404 bytes.
+currently being playable at 389 bytes.
 
 ![gameplay](./aux/gameplay.gif)
 
@@ -19,10 +19,20 @@ currently being playable at 404 bytes.
 - VGA-compatible card
 - IBM PC-compatible BIOS supporting Option ROM
 
+## Versions
+
+As of 1.1, two versions are provided -- snake_lean.img with limited features, providing
+playable game in 318 bytes, and snake_standard.img with score counter, random seed,
+and slightly fancier graphics in 389 bytes.
+
 ## Building nad installing
 
-Use `make snake.img` to build the bootsector image. If you want to put this bootsector onto drive,
+Use `make` to build the bootsector image. If you want to put this bootsector onto drive,
 refer to `dd` manpage.
+
+`make snake_standard.img` and `make snake_lean.img` shoud reflect the configuration
+of release builds. Provide your own settings with `make SETTINGS=my_settings.asm` and
+configure the build however you want!
 
 ## Testing
 
