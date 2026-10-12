@@ -21,9 +21,10 @@ currently being playable at 389 bytes.
 
 ## Versions
 
-As of 1.1, two versions are provided -- snake_lean.img with limited features, providing
-playable game in 318 bytes, and snake_standard.img with score counter, random seed,
-and slightly fancier graphics in 389 bytes.
+As of 1.1, two builds are provided:
+- `snake_lean.img` (**318** bytes) - as barebones as possible
+- `snake_standard.img` (**389** bytes) - score counter, random seed, and slightly fancier
+  graphics.
 
 ## Building nad installing
 
@@ -31,8 +32,10 @@ Use `make` to build the bootsector image. If you want to put this bootsector ont
 refer to `dd` manpage.
 
 `make snake_standard.img` and `make snake_lean.img` shoud reflect the configuration
-of release builds. Provide your own settings with `make SETTINGS=my_settings.asm` and
-configure the build however you want!
+of release builds.
+
+Provide your own settings with `make SETTINGS=my_settings.asm` and
+configure the build however you want.
 
 ## Testing
 
