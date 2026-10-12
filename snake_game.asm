@@ -1,6 +1,5 @@
 cpu 8086
 
-%include "settings.asm"
 %include "keys.asm"
 %include "consts.asm"
 %include "colors.asm"
@@ -19,8 +18,9 @@ cpu 8086
     cli
     cld
     xor ax, ax
+    DEAD_mov_seg_reg_1:
     mov ds, ax
-
+    DEAD_mov_seg_reg_2:
     mov ss, ax
     DEAD_free_zero_0:
     mov sp, 0x7C00
@@ -36,7 +36,6 @@ cpu 8086
     sti
 
     mov ax, 0x13; VGA 320x200x8
-    DEAD_bios_opcode_1:
     int 0x10
 
     %if COLOR_BACKGROUND != 0
@@ -47,12 +46,14 @@ cpu 8086
     %endif
 
     ; draw board
+    %ifdef FEAT_BORDER
     mov al, COLOR_BORDER
     DRAW_RECT_AT \
         BOARD_POS_X - BOARD_BORDER,\
         BOARD_POS_Y - BOARD_BORDER,\
         BOARD_WIDTH + BOARD_BORDER * 2,\
         BOARD_HEIGHT + BOARD_BORDER * 2
+    %endif
     mov al, CELL_EMPTY
     DRAW_RECT_AT \
         BOARD_POS_X,\
@@ -60,23 +61,27 @@ cpu 8086
         BOARD_WIDTH,\
         BOARD_HEIGHT
 
-    DEAD_free_zero_2:
+    %ifdef FEAT_RANDOM_SEED
     mov  ah, 00h
-    DEAD_bios_opcode_2:
     int  1Ah
     mov  [seed], dx
+    %endif
 
     %ifdef UNSAFE_CLOCK
     mov cl, 4
     %else
     mov cx, 4
     %endif
+
     mov di, [pos]
     .l:
     call deq_push
     loop .l
-    ; mov al, CELL_SNAKE
+
+    %ifdef FEAT_DRAW_INITIAL_POS
+    mov al, CELL_SNAKE
     call draw_at
+    %endif
 
 main_loop:
     %ifdef FEAT_HALT
@@ -135,29 +140,31 @@ main_loop:
         jmp game_over ; collision
     .consume_food:
 
-    ; update score
-        inc byte [score]
-        mov al, [score]
-        aam
-        add ax, 0x3030 ; num + 0x30 = chr(num)
-        push ax
+    %ifdef FEAT_SCORE
+        ; update score
+            inc byte [score]
+            mov al, [score]
+            aam
+            add ax, 0x3030 ; num + 0x30 = chr(num)
+            push ax
 
-        mov ah, 02h
-        xor bh, bh ; PAGE 0
-        mov dx, (SCORE_POSITION_Y/8)*256+(SCORE_POSITION_X/8)
-        int 10h
+            mov ah, 02h
+            xor bh, bh ; PAGE 0
+            mov dx, (SCORE_POSITION_Y/8)*256+(SCORE_POSITION_X/8)
+            int 10h
 
-        pop dx
+            pop dx
 
-        mov ah, 0Eh
-        xchg al, dh
-        mov bl, COLOR_WHITE
-        int 10h
-    %ifndef UNSAFE_BIOS_CALLS
-        mov ah, 0Eh
-    %endif
-        xchg al, dl
-        int 10h
+            mov ah, 0Eh
+            xchg al, dh
+            mov bl, COLOR_WHITE
+            int 10h
+        %ifndef UNSAFE_BIOS_CALLS
+            mov ah, 0Eh
+        %endif
+            xchg al, dl
+            int 10h
+        %endif
 
 
     ; generate new food
@@ -305,12 +312,14 @@ deq_peek:
 
 
 game_over:
-    mov al, COLOR_RED
-    DRAW_RECT_AT \
+    %ifdef FEAT_GAME_OVER_SCREEN
+        mov al, COLOR_RED
+        DRAW_RECT_AT \
         BOARD_POS_X,\
         BOARD_POS_Y+(BOARD_HEIGHT-20)/2,\
         BOARD_WIDTH,\
         20
+    %endif
     jmp game_over
 
 random_0_BS_MIN1:

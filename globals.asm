@@ -11,10 +11,10 @@ food_pos dw SCREEN_WIDTH*(BOARD_POS_Y + (20 * SNAKE_WIDTH) % BOARD_HEIGHT)\
     clock equ (DEAD_free_zero_0 + 1) ; lower byte of MOV immediate
     score equ (DEAD_free_zero_3 + 3) ; lower byte of MOV addr, immediate address
 
-    deq_begin equ DEAD_bios_opcode_1 ; opcode
-    deq_end equ DEAD_bios_opcode_2 ; opcode
+    deq_begin equ DEAD_mov_seg_reg_1 ; opcode
+    deq_end equ DEAD_mov_seg_reg_2 ; opcode
 
-    last_scancode equ (DEAD_free_zero_2 + 1) ; operand of 8-bit MOV
+    last_scancode equ (DEAD_free_zero_4 + 3) ; lower byte of MOV addr, immediate address
 %else
     clock db 0
     score db 0

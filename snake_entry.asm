@@ -1,8 +1,10 @@
-
+%include "settings.asm"
 
 org 0x7C00
 
+%ifndef UNSAFE_SKIP_JMP
 jmp 0:start
+%endif
 start:
 %include "snake_game.asm"
 

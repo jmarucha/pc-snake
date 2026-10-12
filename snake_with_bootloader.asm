@@ -1,5 +1,6 @@
 bits 16
 
+%include "settings.asm"
 ;; version with bootloader
 
 
