@@ -39,12 +39,12 @@ cpu 8086
     DEAD_bios_opcode_1:
     int 0x10
 
-    mov al, COLOR_BACKGROUND ; this black generates collisions
-
-    ;clear_to_color:
-    xor di, di
-    mov cx, SCREEN_SIZE
-    rep stosb
+    %if COLOR_BACKGROUND != 0
+        mov al, COLOR_BACKGROUND ; this black generates collisions
+        xor di, di
+        mov cx, SCREEN_SIZE
+        rep stosb
+    %endif
 
     ; draw board
     mov al, COLOR_BORDER
