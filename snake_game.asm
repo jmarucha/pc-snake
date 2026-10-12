@@ -339,7 +339,7 @@ game_over:
     out 42h, al
     out 61h, al
     %endif
-    .l
+    .l:
     jmp .l
 
 random_0_BS_MIN1:

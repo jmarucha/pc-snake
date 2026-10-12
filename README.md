@@ -1,7 +1,7 @@
 # pc-snake
 
 This is bloat free version of popular game `snake`. It fits entirely into drive's bootsector,
-currently being playable at 389 bytes.
+currently being playable at 318 bytes, and can be packed with features in 412 bytes.
 
 ![gameplay](./aux/gameplay.gif)
 
@@ -11,6 +11,7 @@ currently being playable at 389 bytes.
 - Score counter!
 - Realistic colors (4 on screen, 5 in V-buffer!)
 - Pause option (F1 and quite a lot of different buttons)
+- Mesmerising sound effects
 
 ## Minimal system requirements
 

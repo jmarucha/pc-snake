@@ -13,7 +13,7 @@ snake_lean.img: $(ASM_FILES)
 	$(ASM) -p settings_lean.asm snake_entry.asm -f bin -o snake_lean.img
 
 snake_standard.img: $(ASM_FILES)
-	$(ASM) -p settings.asm snake_entry.asm -f bin -o snake_lean.img
+	$(ASM) -p settings.asm snake_entry.asm -f bin -o snake_standard.img
 
 snake_debug.img: $(ASM_FILES)
 	$(ASM) snake_with_bootloader.asm -f bin -o snake_debug.img -l snake_debug.lst

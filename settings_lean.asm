@@ -37,9 +37,10 @@ COLOR_BACKGROUND equ COLOR_ZERO
 
 ; Features:
 
-; %define FEAT_HALT +1 B
-;%define FEAD_RANDOM_SEED
-;%define FEAT_GAME_OVER_SCREEN 11
-;%define FEAT_BORDER 11
-;%define FEAT_SCORE 25
-;%define FEAT_DRAW_INITIAL_POS 5
+; %define FEAT_HALT 1
+; %define FEAT_RANDOM_SEED 6
+; %define FEAT_GAME_OVER_SCREEN 11
+; %define FEAT_BORDER 11
+; %define FEAT_SCORE 25
+; %define FEAT_DRAW_INITIAL_POS 5
+; %define FEAT_SOUND 15
