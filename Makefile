@@ -29,6 +29,7 @@ run: snake.img
 	qemu-system-i386 -drive format=raw,file=snake.img
 
 dosbox: snake.img
+	truncate -s360K snake.img
 	$(DOSBOX) -conf dosbox.conf
 
 clean:

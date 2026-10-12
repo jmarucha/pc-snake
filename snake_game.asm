@@ -140,6 +140,12 @@ main_loop:
         jmp game_over ; collision
     .consume_food:
 
+    %ifdef FEAT_SOUND
+    ; bytes 0 & 1 == 1 -- fire pc speaker
+    mov al, 3
+    out 61h, al
+    %endif
+
     %ifdef FEAT_SCORE
         ; update score
             inc byte [score]
@@ -285,6 +291,11 @@ clock_interrupt:
     mov al, 20h
     out 20h, al ; ack
 
+    %ifdef FEAT_SOUND
+    ; bytes 0 & 1 == 0 -- mute pc speaker
+    out 61h, al
+    %endif
+
     ; pop ds
     pop ax
     iret
@@ -320,7 +331,17 @@ game_over:
         BOARD_WIDTH,\
         20
     %endif
-    jmp game_over
+
+    %ifdef FEAT_SOUND
+    ; bytes 0 & 1 == 1 -- fire pc speaker
+    mov ax, 33
+    out 42h, al
+    out 42h, al
+    mov al, 3
+    out 61h, al
+    %endif
+    .l
+    jmp .l
 
 random_0_BS_MIN1:
     mov  ax, [seed]
