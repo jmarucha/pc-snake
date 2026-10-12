@@ -141,9 +141,9 @@ main_loop:
     .consume_food:
 
     %ifdef FEAT_SOUND
-    ; bytes 0 & 1 == 1 -- fire pc speaker
-    mov al, 3
-    out 61h, al
+        ; bytes 0 & 1 == 1 -- fire pc speaker
+        mov al, 3
+        out 61h, al
     %endif
 
     %ifdef FEAT_SCORE
@@ -334,10 +334,9 @@ game_over:
 
     %ifdef FEAT_SOUND
     ; bytes 0 & 1 == 1 -- fire pc speaker
-    mov ax, 33
+    mov al, 33
     out 42h, al
     out 42h, al
-    mov al, 3
     out 61h, al
     %endif
     .l
