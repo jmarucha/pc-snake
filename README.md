@@ -22,10 +22,10 @@ currently being playable at 318 bytes, and can be packed with features in 412 by
 
 ## Versions
 
-As of 1.1, two builds are provided:
+As of 1.2, two builds are provided:
 - `snake_lean.img` (**318** bytes) - as barebones as possible
-- `snake_standard.img` (**389** bytes) - score counter, random seed, and slightly fancier
-  graphics.
+- `snake_standard.img` (**412** bytes) - score counter, random seed, and slightly fancier
+  graphics, sound.
 
 ## Building nad installing
 
@@ -63,6 +63,7 @@ $ gdb
 In emulation:
 
 - QEMU
+- Dosbox-x
 - 86Box:
     - IBM PC (1981) with 32 kB RAM, IBM VGA card and GLaBIOS 0.4.0
     - IBM PC (1982) with 64 kB RAM, IBM VGA card -- older BIOSes lack Option ROM support
@@ -71,3 +72,4 @@ In emulation:
 On metal:
 
 - AMD Ryzen 5800X with 32 GB of RAM and VESA-compatible card (Nvidia 3080)
+- Fujitsu Siemens laptop with Celeron M and 1.5 GB of RAM.
